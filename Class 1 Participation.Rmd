@@ -1,0 +1,30 @@
+---
+title: "Class 1 Participation"
+author: "Jessica Smyrski"
+date: "1/13/2020"
+output: 
+  md_document:
+    variant: markdown_github
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r libs }
+
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r}
+qqplot(mtcars$wt)
+```
+
+
+
+
+
+
