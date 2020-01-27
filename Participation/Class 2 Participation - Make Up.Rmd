@@ -11,7 +11,7 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-```{r library, echo=FALSE}
+```{r library, echo=FALSE, warning=FALSE}
 library(gapminder)
 library(ggplot2)
 library(tidyverse)
@@ -31,7 +31,7 @@ ggplot(data = gapminder) +
   geom_point(mapping = aes(x = year, y = pop, color = continent))
 ```
 
-```{r third dimension2}
+```{r third dimension2, warning=FALSE}
 ggplot(data = gapminder) + 
   geom_point(mapping = aes(x = year, y = pop, size = continent))
 ```
