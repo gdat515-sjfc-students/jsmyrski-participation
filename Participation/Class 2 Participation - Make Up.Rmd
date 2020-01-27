@@ -1,0 +1,88 @@
+---
+title: "Class 2 Participation - Make Up"
+author: "Jessica Smyrski"
+date: "1/22/2020"
+output:
+  md_document:
+    variant: gfm
+---
+## Participation Make-Up
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r library, echo=FALSE}
+library(gapminder)
+library(ggplot2)
+library(tidyverse)
+```
+
+### Basic ggplot 2 Figure
+
+```{r basic plot}
+ggplot(data = gapminder)+
+  geom_point(mapping = aes(x = year, y = pop))
+```
+
+### Adding in Third Dimension Through Aesthetics
+
+```{r third dimension}
+ggplot(data = gapminder) + 
+  geom_point(mapping = aes(x = year, y = pop, color = continent))
+```
+
+```{r third dimension2}
+ggplot(data = gapminder) + 
+  geom_point(mapping = aes(x = year, y = pop, size = continent))
+```
+
+```{r third dimension3}
+ggplot(data = gapminder) + 
+  geom_point(mapping = aes(x = year, y = pop, shape = continent))
+```
+
+### Faceting
+
+```{r faceting}
+ggplot(data = gapminder) + 
+  geom_point(mapping = aes(x = year, y = pop, color = continent)) + 
+  facet_wrap(~ continent, nrow = 2)
+```
+
+### Adding in Smoothed Line
+
+```{r smoothed line}
+ggplot(data = gapminder) + 
+  geom_smooth(mapping = aes(x = year, y = pop, color = continent))
+```
+
+```{r smoothed line2}
+ggplot(data = gapminder, mapping = aes(x = year, y = pop)) + 
+  geom_point(mapping = aes(color = continent)) + 
+  geom_smooth()
+```
+
+### Flipping Coordinate System
+
+```{r original boxplot}
+ggplot(data = gapminder , mapping=  aes(x= continent, y = lifeExp)) +
+  geom_boxplot()
+```
+
+```{r flipping coordinates}
+ggplot(data = gapminder , mapping=  aes(x= continent, y = lifeExp)) +
+  geom_point()+
+  geom_boxplot() + 
+  coord_flip()
+```
+
+### Converting One Coordinate to a Log
+```{r converting to log, warning=FALSE}
+gapminder %>% 
+  group_by(year, continent) %>% 
+  summarise(pop = sum(pop)) %>% 
+ggplot(data = ., mapping = aes(x = year, y = pop, color = continent)) +
+  geom_point() +
+  scale_y_log10()
+```
+
