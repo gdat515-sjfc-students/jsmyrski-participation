@@ -1,7 +1,5 @@
 ## Participation Make-Up
 
-    ## Warning: package 'gapminder' was built under R version 3.6.2
-
     ## -- Attaching packages ----------------------------------------- tidyverse 1.2.1 --
 
     ## v tibble  2.1.3     v purrr   0.3.2
@@ -35,8 +33,6 @@ ggplot(data = gapminder) +
 ggplot(data = gapminder) + 
   geom_point(mapping = aes(x = year, y = pop, size = continent))
 ```
-
-    ## Warning: Using size for a discrete variable is not advised.
 
 ![](Class_2_Participation_-_Make_Up_files/figure-gfm/third%20dimension2-1.png)<!-- -->
 
