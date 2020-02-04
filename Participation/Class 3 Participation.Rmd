@@ -1,0 +1,44 @@
+---
+title: "Class 3 Participation"
+output: 
+  flexdashboard::flex_dashboard:
+    storyboard: true
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+library(tidyverse)
+library(shiny)
+library(htmltools)
+library(shinydashboard)
+
+```
+
+Column {data-width=650}
+-----------------------------------------------------------------------
+
+### **Chart A**: Two astrisks on either side of words will bold them after the three pound signs
+
+```{r}
+
+```
+
+***
+three astrisks will add commentary on the side of the figure.
+
+
+Column {data-width=350}
+-----------------------------------------------------------------------
+
+### Chart B
+
+```{r}
+
+```
+
+### Chart C
+
+```{r}
+
+```
+
