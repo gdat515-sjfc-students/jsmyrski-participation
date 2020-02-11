@@ -1,0 +1,187 @@
+---
+title: "Class 4 Participation"
+author: "Jessica Smyrski"
+date: "2/10/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+library(plotly)
+```
+
+## Plotly
+
+```{r diamonds dataset}
+head(diamonds)
+
+```
+
+### Q-plot Function
+```{r q-plot function}
+
+plot_ly(data = diamonds, x = ~carat, y = ~price) #have to use a tilda(~) to specify x and y arguments
+
+#what happens when x is not numeric?
+plot_ly(data = diamonds, x = ~cut, y = ~price) #creates a bar graph for you, however the price is now the sum of all of the grouped diamonds together.
+
+diamonds %>%
+  sample_n(100) %>%
+  plot_ly(data = ., x = ~carat, y = ~price, type = "scatter") #shows a sample of the distribution, also a little faster to run than the normal plot_ly argument because of the sample
+
+#going to sample so it runs faster
+diamonds.sample <- diamonds %>%
+  sample_n(10000)
+
+plot_ly(data = diamonds.sample, x = ~carat, y = ~price) %>%
+  add_trace(p = ., type = "scatter")
+
+```
+
+## Styling
+
+### Expanding on Plotly
+```{r expanding on plotly}
+
+plot_ly(data = diamonds.sample, x = ~carat, y = ~price) %>%
+  add_trace(p = ., type = "scatter") %>%
+  layout(xaxis = list(range = c(2.5, 5), title = "Carat"),
+         yaxis = list(title = "Price")
+         )
+
+#editing the text that you see when you hover over a data point
+plot_ly(data = diamonds.sample, x = ~carat, y = ~price, text = ~paste0("Price: $", price, "<br>Carat: ", carat)) %>%
+  add_trace(p = ., type = "scatter") %>%
+  layout(xaxis = list(range = c(2.5, 5), title = "Carat"),
+         yaxis = list(title = "Price")
+         )
+```
+
+### More Plotly
+```{r more plotly}
+#creating data of our own
+lines.data <- data.frame(x = c(1:100),
+                         trace0 = rnorm(100, mean = 5)
+                         ) %>%
+  mutate(trace1 = log(trace0),
+         trace2 = trace0^2)
+
+plot_ly(data = lines.data, x = ~x) %>%
+  add_trace(y = ~trace0, name = "Trace Zero", mode = 'lines') %>%
+  add_trace(y = ~trace1, name = "Trace One", mode = 'lines+markers') %>%
+  add_trace(y = ~trace2, name = "Trace Two", mode = 'markers')
+#most tedious part of using plotly because you have to specify which styles are each different lines.
+
+#pivot_longer(data = lines.data, names_to = "trace", values_to = "val")
+#tried to use pivot_longer function but it didnt work so using gather() function
+
+#flipping the data long by using gather() and putting it into a new vector
+lines.data.wide <- gather(data = lines.data, key = "trace", value = "val", -x)
+
+#plotting the new vector
+plot_ly(data = lines.data.wide, x = ~x, y = ~val, color = ~trace, mode = "lines")
+
+#different styles to show tick lines on axes
+plot_ly(data = lines.data.wide, x = ~x, y = ~val, color = ~trace, mode = "lines+markers") %>%
+  layout(xaxis = list(ticks = "outside",
+                      dtick = 10,
+                      ticklen = 5,
+                      tickwidth = 2,
+                      tickcolor = toRGB("pink"),
+                      title = "X",
+                      showgrid = FALSE,
+                      zeroline = FALSE),
+          yaxis = list(ticks = "outside",
+                      dtick = 5,
+                      ticklen = 10,
+                      tickwidth = 1,
+                      tickcolor = toRGB("pink"),
+                      title = "Y",
+                      showgrid = FALSE,
+                      zeroline = FALSE),
+         showlegend = FALSE) # <--- adding this line of code in hides the legend
+
+#Adding in legend where we specify
+plot_ly(data = lines.data.wide, x = ~x, y = ~val, color = ~trace, mode = "lines+markers") %>%
+  layout(xaxis = list(ticks = "outside",
+                      dtick = 10,
+                      ticklen = 5,
+                      tickwidth = 2,
+                      tickcolor = toRGB("pink"),
+                      title = "X",
+                      showgrid = FALSE,
+                      zeroline = FALSE),
+          yaxis = list(ticks = "outside",
+                      dtick = 5,
+                      ticklen = 10,
+                      tickwidth = 1,
+                      tickcolor = toRGB("pink"),
+                      title = "Y",
+                      showgrid = FALSE,
+                      zeroline = FALSE),
+         showlegend = TRUE,
+         legend = list(x = .15, y = .95)) #<--- puts legend where we want within the plot
+
+plot_ly(data = lines.data.wide, x = ~x, y = ~val, color = ~trace, mode = "lines+markers") %>%
+  layout(xaxis = list(ticks = "outside",
+                      dtick = 10,
+                      ticklen = 5,
+                      tickwidth = 2,
+                      tickcolor = toRGB("pink"),
+                      title = "X",
+                      showgrid = FALSE,
+                      zeroline = FALSE),
+          yaxis = list(ticks = "outside",
+                      dtick = 5,
+                      ticklen = 10,
+                      tickwidth = 1,
+                      tickcolor = toRGB("pink"),
+                      title = "Y",
+                      showgrid = FALSE,
+                      zeroline = FALSE),
+         showlegend = TRUE,
+         legend = list(orientation = 'h', y = 100),
+         title = "Fake Data!") # <--- puts legend at the top of the plot
+
+#legend items are clickable, so if you click on them it takes that one out of the plot.
+```
+
+### Histogram 2d Conpour Plot
+```{r histogram 2d contour plot}
+
+cnt <- with(diamonds.sample, table(cut, clarity)) #table of cut and clarity
+
+plot_ly(data = diamonds.sample, x = ~cut, y = ~clarity, z = ~cnt) %>%
+  add_trace(type = 'histogram2dcontour',
+            contours = list(showlabels = T, labelfont = list(color = 'white')))
+```
+
+### Boxplots
+```{r boxplots}
+
+plot_ly(data = diamonds.sample, y = ~price, color = ~cut, type = "box")
+plot_ly(data = diamonds.sample, x = ~price, color = ~cut, type = "box") #easier to read boxplot
+
+```
+
+### 3d Plot
+```{r 3d plot}
+
+plot_ly(data = diamonds.sample, x = ~carat, y = ~price, z = ~depth, color = ~cut) #works on the newest version of Rstudio
+```
+
+### Ggplot2 to plotly
+```{r ggplot2 to plotly}
+
+plot1 <- diamonds.sample %>%
+  ggplot(data = ., aes(x = price, y = depth, color = cut)) +
+  geom_point() +
+  stat_smooth()
+
+ggplotly(plot1) #takes the ggplot figure and turns it into an interactly plotly graphic
+
+```
