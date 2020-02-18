@@ -1,0 +1,159 @@
+---
+title: "Maps Using Tinycensus & Leaflet"
+author: "Jessica Smyrski"
+date: "2/17/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+`%notin%` <- Negate(`%in%`)
+
+req.packages <- c("leaflet", "tidycensus", "tidyverse", "ggthemes", "ggExtra", "scales")
+
+if(any(installed.packages() %notin% req.packages)) {
+  
+  missing.packages.inds <- which(req.packages %notin% installed.packages())
+  
+  install.packages(req.packages[missing.packages.inds])
+  
+}
+
+eval(
+  parse(
+    text = paste0('library(',req.packages,')')
+  )
+)
+```
+
+Sign Up for a US Census API Key
+
+### tidycensus
+#### Basic Usage
+
+```{r}
+if(!file.exists("~/.Rprofile")) #only create if not already there
+ file.create("~/.Rprofile")  #(dont overwrite it)
+file.edit("~/.Rprofile")
+
+source('~/.Rprofile')
+
+#census_api_key(key = "<API Key Goes Here>", install = TRUE, overwrite = TRUE) #use this in replace of code above.
+census_api_key(key = census.api.key, install = TRUE, overwrite = TRUE)
+
+
+
+```
+
+
+Two main functions are the "get_acs" and "get_decennial" functions.
+
+* *get_acs*: access the 5-year
+
+
+Starting with US Census data
+
+-year
+-dataset
+-cache
+```{r, datatable of the census filtered by year}
+census.2000 <- load_variables(year = 2000, "sf1", cache = TRUE)
+
+DT::datatable(
+  head(
+    census.2000, n = 20
+  )
+)
+```
+
+With similar syntax, but using ACS data
+```{r}
+acs.2017 <- load_variables(year = 2017, dataset = 'acs1', cache = TRUE)
+
+DT::datatable(
+  head(
+    acs.2017, n = 20
+  )
+)
+```
+
+#### Working with ACS/Census Data
+
+Now we'll utilize the workhorse functions decribed above.
+
+List of NYS zipcodes (https://data.ny.gov/widgets/juva-r6g2).
+
+```{r}
+ACS.VT <- get_acs(geography = "county",
+            state = "VT",
+            variables = "B19013_001",
+            year = 2018,
+            keep_geo_vars = TRUE,
+            cache_table = TRUE,
+            geometry = TRUE,
+            )
+```
+
+
+```{r}
+ACS.VT %>%
+  ggplot(data = ., aes(y = reorder(NAME.y, estimate), x = estimate)) +
+  geom_point() +
+  labs(
+    y = "",
+    x = "Median Income in 2018") +
+  ggtitle (label = "Vermont Median Income by County")
+
+```
+
+```{r}
+sjfc <- leaflet() %>%
+   addTiles() %>% #Add default OpenStreetMap map tiles
+  addMarkers(lng = -77.5122, lat = 43.1175, popup = "SJFC:: GDAT515")
+
+sjfc
+```
+
+```{r}
+color.pal <- colorNumeric(palette = "viridis", domain = ACS.VT$estimate)
+```
+
+```{r}
+VT.income.map <- leaflet(data = ACS.VT) %>%
+  addTiles() %>%
+  setView(lng = -72.9726, lat = 43.6106, zoom = 7) %>%
+  addPolygons(fillColor = ~color.pal(ACS.VT$estimate),
+              fillOpacity = 0.9,
+              #layerID = ~GEOID,
+              fill = TRUE,
+              weight = 0.7,
+              smoothFactor = 0.3,
+              color = "black",
+              highlight = highlightOptions(weight = 2,
+                                           color = "Black",
+                                           fillOpacity = 0.9,
+                                           bringToFront = FALSE),
+              popup = ~paste("<b>County: </b>", NAME.y, "<br>",
+                             "<b>Median Household Income:</b>", dollar(estimate))
+  )%>%
+  addLegend(position = "topleft",
+            pal = color.pal,
+            values = ACS.VT$estimate,
+            title = "Median Income")
+
+VT.income.map #prints the map
+
+VT.income.map %>%
+  addAwesomeMarkers(lng = -72.9621812, lat = 43.6068051, icon = awesomeIcons("fa-home", library = 'fa', markerColor = "purple"))
+
+```
+
+
+
+
+
+
+
